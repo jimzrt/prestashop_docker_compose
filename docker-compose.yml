@@ -1,0 +1,40 @@
+version: '2'
+
+services: 
+  prestashop:
+    #network_mode: "host"
+    build: ./docker/prestashop
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - mariadb:mariadb
+    depends_on:
+      - mariadb
+    volumes:
+      - ./docker/common:/scripts
+      - ./presta:/var/www/html:delegated
+    environment:
+      - PS_DEV_MODE=1
+      - DB_SERVER=mariadb
+      - DB_USER=root
+      - DB_PASSWD=root
+      - DB_NAME=prestashop
+      - PS_DOMAIN=localhost
+      - ADMIN_MAIL=james.tophoven@gmail.com
+      - ADMIN_PASSWD=hunter
+      - PS_INSTALL_AUTO=1
+#      - PS_ALL_LANGUAGES=1
+      - PS_FOLDER_ADMIN=administrator
+      - PS_FOLDER_INSTALL=installation
+
+  mariadb:
+    build: ./docker/mariadb
+    #network_mode: "host"
+    volumes:
+      - ./maria:/var/lib/mysql
+    #ports:
+    #  - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=prestashop
