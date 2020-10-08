@@ -1,40 +1,76 @@
 version: '2'
 
-services: 
+services:
   prestashop:
-    #network_mode: "host"
     build: ./docker/prestashop
     ports:
-      - 80:80
-      - 443:443
-    links:
-      - mariadb:mariadb
+      - 8080:8080
     depends_on:
       - mariadb
+      - memcached
     volumes:
       - ./docker/common:/scripts
       - ./presta:/var/www/html:delegated
+      - ./apache2/ports.conf:/etc/apache2/ports.conf
+      - ./apache2/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
     environment:
-      - PS_DEV_MODE=1
+      - PS_DEV_MODE=0
+      - PS_ENABLE_SSL=1
       - DB_SERVER=mariadb
       - DB_USER=root
       - DB_PASSWD=root
       - DB_NAME=prestashop
-      - PS_DOMAIN=localhost
-      - ADMIN_MAIL=james.tophoven@gmail.com
-      - ADMIN_PASSWD=hunter
+      - PS_DOMAIN=www.jamestop.duckdns.org
+      - ADMIN_MAIL="${ADMIN_MAIL}"
+      - ADMIN_PASSWD="${ADMIN_PASSWD}"
       - PS_INSTALL_AUTO=1
 #      - PS_ALL_LANGUAGES=1
       - PS_FOLDER_ADMIN=administrator
       - PS_FOLDER_INSTALL=installation
-
   mariadb:
     build: ./docker/mariadb
-    #network_mode: "host"
     volumes:
       - ./maria:/var/lib/mysql
-    #ports:
-    #  - 3306:3306
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=prestashop
+  swag:
+    image: linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - URL=jamestop.duckdns.org
+      - SUBDOMAINS=wildcard
+      - VALIDATION=duckdns
+      - DUCKDNSTOKEN="${DUCKDNSTOKEN}"
+      - EMAIL="${ADMIN_MAIL}"
+      - ONLY_SUBDOMAINS=false #optional
+      - STAGING=false #optional
+    volumes:
+      - ./config:/config
+      - ./presta:/presta:delegated
+      - ./nginx/prestashop.subdomain.conf:/config/nginx/proxy-confs/prestashop.subdomain.conf
+    ports:
+      - 443:443
+      - 80:80 #optional
+    restart: unless-stopped
+  duckdns:
+    image: linuxserver/duckdns
+    container_name: duckdns
+    environment:
+      - PUID=1000 #optional
+      - PGID=1000 #optional
+      - TZ=Europe/London
+      - SUBDOMAINS=jamestop
+      - TOKEN="${DUCKDNSTOKEN}"
+      - LOG_FILE=false #optional
+    restart: unless-stopped
+  memcached:
+    image: memcached:latest
+    container_name: memcached
