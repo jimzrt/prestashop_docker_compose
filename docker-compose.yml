@@ -21,8 +21,8 @@ services:
       - DB_PASSWD=root
       - DB_NAME=prestashop
       - PS_DOMAIN=www.jamestop.duckdns.org
-      - ADMIN_MAIL="${ADMIN_MAIL}"
-      - ADMIN_PASSWD="${ADMIN_PASSWD}"
+      - ADMIN_MAIL=${ADMIN_MAIL}
+      - ADMIN_PASSWD=${ADMIN_PASSWD}
       - PS_INSTALL_AUTO=1
 #      - PS_ALL_LANGUAGES=1
       - PS_FOLDER_ADMIN=administrator
@@ -48,8 +48,8 @@ services:
       - URL=jamestop.duckdns.org
       - SUBDOMAINS=wildcard
       - VALIDATION=duckdns
-      - DUCKDNSTOKEN="${DUCKDNSTOKEN}"
-      - EMAIL="${ADMIN_MAIL}"
+      - DUCKDNSTOKEN=${DUCKDNSTOKEN}
+      - EMAIL=${ADMIN_MAIL}
       - ONLY_SUBDOMAINS=false #optional
       - STAGING=false #optional
     volumes:
@@ -68,7 +68,7 @@ services:
       - PGID=1000 #optional
       - TZ=Europe/London
       - SUBDOMAINS=jamestop
-      - TOKEN="${DUCKDNSTOKEN}"
+      - TOKEN=${DUCKDNSTOKEN}
       - LOG_FILE=false #optional
     restart: unless-stopped
   memcached:
