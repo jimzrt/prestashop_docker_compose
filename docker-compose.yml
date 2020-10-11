@@ -27,6 +27,10 @@ services:
 #      - PS_ALL_LANGUAGES=1
       - PS_FOLDER_ADMIN=administrator
       - PS_FOLDER_INSTALL=installation
+  ebayfeedback:
+    build: ./docker/ebayfeedback
+    ports:
+     - 8081:8081
   mariadb:
     build: ./docker/mariadb
     volumes:
@@ -56,6 +60,7 @@ services:
       - ./config:/config
       - ./presta:/presta:delegated
       - ./nginx/prestashop.subdomain.conf:/config/nginx/proxy-confs/prestashop.subdomain.conf
+      - ./nginx/ebayfeedback.subdomain.conf:/config/nginx/proxy-confs/ebayfeedback.subdomain.conf
     ports:
       - 443:443
       - 80:80 #optional
