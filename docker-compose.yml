@@ -3,6 +3,7 @@ version: '2'
 services:
   prestashop:
     build: ./docker/prestashop
+    container_name: prestashop
     ports:
       - 8080:8080
     depends_on:
@@ -27,12 +28,16 @@ services:
 #      - PS_ALL_LANGUAGES=1
       - PS_FOLDER_ADMIN=administrator
       - PS_FOLDER_INSTALL=installation
+    restart: unless-stopped
   ebayfeedback:
     build: ./docker/ebayfeedback
+    container_name: ebayfeedback
     ports:
      - 8081:8081
+    restart: unless-stopped
   mariadb:
     build: ./docker/mariadb
+    container_name: mariadb
     volumes:
       - ./maria:/var/lib/mysql
       - /etc/timezone:/etc/timezone:ro
@@ -40,6 +45,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=prestashop
+    restart: unless-stopped
   swag:
     image: linuxserver/swag
     container_name: swag
@@ -79,3 +85,4 @@ services:
   memcached:
     image: memcached:latest
     container_name: memcached
+    restart: unless-stopped
